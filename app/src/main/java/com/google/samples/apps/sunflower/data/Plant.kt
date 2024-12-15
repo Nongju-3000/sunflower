@@ -22,22 +22,40 @@ import androidx.room.PrimaryKey
 import java.util.Calendar
 import java.util.Calendar.DAY_OF_YEAR
 
+/**
+ * `Plant`는 데이터베이스의 `plants` 테이블과 매핑되는 데이터 클래스입니다.
+ *
+ * @param plantId 식물의 고유 ID (기본 키)
+ * @param name 식물의 이름
+ * @param description 식물의 설명
+ * @param growZoneNumber 성장 구역 번호
+ * @param wateringInterval 물을 줘야 하는 주기 (일 단위, 기본값은 7일)
+ * @param imageUrl 식물의 이미지 URL (기본값은 빈 문자열)
+ */
 @Entity(tableName = "plants")
 data class Plant(
-    @PrimaryKey @ColumnInfo(name = "id") val plantId: String,
-    val name: String,
-    val description: String,
-    val growZoneNumber: Int,
-    val wateringInterval: Int = 7, // how often the plant should be watered, in days
-    val imageUrl: String = ""
+    @PrimaryKey @ColumnInfo(name = "id") val plantId: String, // 식물의 고유 ID
+    val name: String, // 식물 이름
+    val description: String, // 식물 설명
+    val growZoneNumber: Int, // 성장 구역 번호
+    val wateringInterval: Int = 7, // 물 주기 (기본값: 7일)
+    val imageUrl: String = "" // 이미지 URL (기본값: 빈 문자열)
 ) {
 
     /**
-     * Determines if the plant should be watered.  Returns true if [since]'s date > date of last
-     * watering + watering Interval; false otherwise.
+     * 식물이 물을 줘야 하는지 판단합니다.
+     * - [since] 날짜가 마지막 물을 준 날짜 + 물 주기보다 크면 true를 반환
+     *
+     * @param since 현재 날짜 또는 기준 날짜
+     * @param lastWateringDate 마지막으로 물을 준 날짜
+     * @return 물을 줘야 하는지 여부
      */
     fun shouldBeWatered(since: Calendar, lastWateringDate: Calendar) =
         since > lastWateringDate.apply { add(DAY_OF_YEAR, wateringInterval) }
 
+    /**
+     * `Plant` 객체의 이름을 반환합니다.
+     * - 디버깅 또는 출력 시 유용합니다.
+     */
     override fun toString() = name
 }

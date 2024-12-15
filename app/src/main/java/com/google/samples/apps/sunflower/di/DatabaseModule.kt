@@ -27,21 +27,45 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
-@InstallIn(SingletonComponent::class)
+/**
+ * DatabaseModule은 데이터베이스와 관련된 의존성을 제공하는 Dagger Hilt 모듈입니다.
+ */
+@InstallIn(SingletonComponent::class) // SingletonComponent에 의존성을 설치하여 애플리케이션 전역에서 사용 가능
 @Module
 class DatabaseModule {
 
+    /**
+     * AppDatabase를 제공하는 메서드
+     * - @Provides와 @Singleton 어노테이션을 사용하여 Dagger Hilt가 이 객체를 생성하고 관리합니다.
+     *
+     * @param context 애플리케이션 컨텍스트
+     * @return AppDatabase 인스턴스
+     */
     @Singleton
     @Provides
     fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase {
-        return AppDatabase.getInstance(context)
+        return AppDatabase.getInstance(context) // 싱글톤으로 데이터베이스 인스턴스 생성
     }
 
+    /**
+     * PlantDao를 제공하는 메서드
+     * - AppDatabase에서 PlantDao를 가져옵니다.
+     *
+     * @param appDatabase AppDatabase 인스턴스
+     * @return PlantDao 인스턴스
+     */
     @Provides
     fun providePlantDao(appDatabase: AppDatabase): PlantDao {
         return appDatabase.plantDao()
     }
 
+    /**
+     * GardenPlantingDao를 제공하는 메서드
+     * - AppDatabase에서 GardenPlantingDao를 가져옵니다.
+     *
+     * @param appDatabase AppDatabase 인스턴스
+     * @return GardenPlantingDao 인스턴스
+     */
     @Provides
     fun provideGardenPlantingDao(appDatabase: AppDatabase): GardenPlantingDao {
         return appDatabase.gardenPlantingDao()

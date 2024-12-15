@@ -23,13 +23,22 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
-@InstallIn(SingletonComponent::class)
+/**
+ * NetworkModule은 UnsplashService와 같은 네트워크 관련 의존성을 제공하는 Dagger Hilt 모듈입니다.
+ */
+@InstallIn(SingletonComponent::class) // SingletonComponent에 의존성을 설치하여 애플리케이션 전역에서 사용 가능하게 설정
 @Module
 class NetworkModule {
 
+    /**
+     * UnsplashService를 제공하는 메서드
+     * - @Provides와 @Singleton 어노테이션을 사용하여 Dagger Hilt가 이 객체를 생성하고 관리합니다.
+     *
+     * @return UnsplashService의 인스턴스
+     */
     @Singleton
     @Provides
     fun provideUnsplashService(): UnsplashService {
-        return UnsplashService.create()
+        return UnsplashService.create() // UnsplashService의 정적 팩토리 메서드로 인스턴스 생성
     }
 }

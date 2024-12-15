@@ -29,44 +29,53 @@ import com.google.samples.apps.sunflower.adapters.SunflowerPagerAdapter
 import com.google.samples.apps.sunflower.databinding.FragmentViewPagerBinding
 import dagger.hilt.android.AndroidEntryPoint
 
+// Dagger Hilt를 사용해 의존성 주입이 가능한 Fragment로 설정
 @AndroidEntryPoint
 class HomeViewPagerFragment : Fragment() {
 
+    // Fragment의 뷰를 생성하는 메서드
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        // 데이터 바인딩 객체 생성
         val binding = FragmentViewPagerBinding.inflate(inflater, container, false)
+
+        // TabLayout과 ViewPager2 연결
         val tabLayout = binding.tabs
         val viewPager = binding.viewPager
 
+        // SunflowerPagerAdapter를 ViewPager에 설정
         viewPager.adapter = SunflowerPagerAdapter(this)
 
-        // Set the icon and text for each tab
+        // TabLayout과 ViewPager를 동기화하며 각 탭에 아이콘과 제목 설정
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
-            tab.setIcon(getTabIcon(position))
-            tab.text = getTabTitle(position)
-        }.attach()
+            tab.setIcon(getTabIcon(position)) // 각 탭의 아이콘 설정
+            tab.text = getTabTitle(position) // 각 탭의 제목 설정
+        }.attach() // 설정 완료 후 탭과 ViewPager 연결
 
+        // Toolbar를 AppCompatActivity의 ActionBar로 설정
         (activity as AppCompatActivity).setSupportActionBar(binding.toolbar)
 
         return binding.root
     }
 
+    // 각 탭의 아이콘을 반환
     private fun getTabIcon(position: Int): Int {
         return when (position) {
-            MY_GARDEN_PAGE_INDEX -> R.drawable.garden_tab_selector
-            PLANT_LIST_PAGE_INDEX -> R.drawable.plant_list_tab_selector
-            else -> throw IndexOutOfBoundsException()
+            MY_GARDEN_PAGE_INDEX -> R.drawable.garden_tab_selector // "My Garden" 탭 아이콘
+            PLANT_LIST_PAGE_INDEX -> R.drawable.plant_list_tab_selector // "Plant List" 탭 아이콘
+            else -> throw IndexOutOfBoundsException() // 유효하지 않은 인덱스 처리
         }
     }
 
+    // 각 탭의 제목을 반환
     private fun getTabTitle(position: Int): String? {
         return when (position) {
-            MY_GARDEN_PAGE_INDEX -> getString(R.string.my_garden_title)
-            PLANT_LIST_PAGE_INDEX -> getString(R.string.plant_list_title)
-            else -> null
+            MY_GARDEN_PAGE_INDEX -> getString(R.string.my_garden_title) // "My Garden" 제목
+            PLANT_LIST_PAGE_INDEX -> getString(R.string.plant_list_title) // "Plant List" 제목
+            else -> null // 유효하지 않은 인덱스 처리
         }
     }
 }

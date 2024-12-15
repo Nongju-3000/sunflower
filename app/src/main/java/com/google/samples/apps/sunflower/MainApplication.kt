@@ -20,10 +20,17 @@ import android.app.Application
 import androidx.work.Configuration
 import dagger.hilt.android.HiltAndroidApp
 
+// Dagger Hilt를 사용해 의존성 주입이 가능한 Application으로 설정
 @HiltAndroidApp
 class MainApplication : Application(), Configuration.Provider {
+
+    // WorkManager의 기본 설정을 제공
     override fun getWorkManagerConfiguration(): Configuration =
-                Configuration.Builder()
-                        .setMinimumLoggingLevel(if (BuildConfig.DEBUG) android.util.Log.DEBUG else android.util.Log.ERROR)
-                        .build()
+        Configuration.Builder()
+            // 디버그 모드에서는 상세 로그(DEBUG), 릴리즈 모드에서는 간단한 로그(ERROR) 수준 설정
+            .setMinimumLoggingLevel(
+                if (BuildConfig.DEBUG) android.util.Log.DEBUG
+                else android.util.Log.ERROR
+            )
+            .build()
 }

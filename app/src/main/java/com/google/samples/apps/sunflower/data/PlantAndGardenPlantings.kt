@@ -20,13 +20,19 @@ import androidx.room.Embedded
 import androidx.room.Relation
 
 /**
- * This class captures the relationship between a [Plant] and a user's [GardenPlanting], which is
- * used by Room to fetch the related entities.
+ * `PlantAndGardenPlantings`는 [Plant]와 사용자의 [GardenPlanting] 간의 관계를 나타내는 데이터 클래스입니다.
+ * - Room은 이 클래스를 사용하여 두 엔터티 간의 관계를 자동으로 처리하고 관련 데이터를 가져옵니다.
+ *
+ * @param plant [Plant] 엔터티를 포함합니다.
+ * @param gardenPlantings [GardenPlanting] 엔터티의 리스트로, 특정 Plant에 연결된 사용자의 GardenPlanting 데이터를 포함합니다.
  */
 data class PlantAndGardenPlantings(
     @Embedded
-    val plant: Plant,
+    val plant: Plant, // Plant 엔터티
 
-    @Relation(parentColumn = "id", entityColumn = "plant_id")
-    val gardenPlantings: List<GardenPlanting> = emptyList()
+    @Relation(
+        parentColumn = "id", // Plant 테이블의 기본 키
+        entityColumn = "plant_id" // GardenPlanting 테이블의 외래 키
+    )
+    val gardenPlantings: List<GardenPlanting> = emptyList() // 특정 Plant와 관련된 GardenPlanting 데이터 리스트
 )

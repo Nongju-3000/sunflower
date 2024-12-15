@@ -24,10 +24,19 @@ import com.google.samples.apps.sunflower.data.PlantAndGardenPlantings
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
+/**
+ * GardenPlantingListViewModel은 사용자의 정원에 심어진 식물 목록을 관리하는 ViewModel입니다.
+ * - Dagger Hilt를 통해 GardenPlantingRepository를 주입받아 데이터 소스와 UI를 연결합니다.
+ */
 @HiltViewModel
 class GardenPlantingListViewModel @Inject internal constructor(
-    gardenPlantingRepository: GardenPlantingRepository
+    gardenPlantingRepository: GardenPlantingRepository // 정원 데이터를 관리하는 Repository
 ) : ViewModel() {
+
+    /**
+     * 심어진 식물과 그 관련 정보를 포함하는 LiveData
+     * - GardenPlantingRepository에서 Flow 형태로 데이터를 가져오고, LiveData로 변환하여 UI에서 관찰 가능하도록 제공합니다.
+     */
     val plantAndGardenPlantings: LiveData<List<PlantAndGardenPlantings>> =
         gardenPlantingRepository.getPlantedGardens().asLiveData()
 }

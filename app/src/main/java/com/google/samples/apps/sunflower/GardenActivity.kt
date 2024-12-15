@@ -22,11 +22,16 @@ import androidx.databinding.DataBindingUtil.setContentView
 import com.google.samples.apps.sunflower.databinding.ActivityGardenBinding
 import dagger.hilt.android.AndroidEntryPoint
 
+// Dagger Hilt를 사용해 의존성 주입이 가능한 Activity로 설정
 @AndroidEntryPoint
 class GardenActivity : AppCompatActivity() {
 
+    // Activity 생명 주기에서 onCreate 메서드 실행
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // 데이터 바인딩을 사용해 레이아웃 XML 파일(activity_garden.xml)을 설정
+        // ActivityGardenBinding 객체를 생성하여 이 Activity에서 UI 요소를 쉽게 접근 가능하게 함
         setContentView<ActivityGardenBinding>(this, R.layout.activity_garden)
     }
 }

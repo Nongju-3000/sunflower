@@ -33,25 +33,41 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+// Dagger Hilt를 사용해 의존성 주입이 가능한 Fragment로 설정
 @AndroidEntryPoint
 class GalleryFragment : Fragment() {
 
+    // GalleryAdapter를 생성하여 RecyclerView에 데이터 바인딩
     private val adapter = GalleryAdapter()
+
+    // Safe Args로 전달된 인자를 관리
     private val args: GalleryFragmentArgs by navArgs()
+
+    // Coroutine Job을 관리하여 이전 작업 취소 가능
     private var searchJob: Job? = null
+
+    // GalleryViewModel을 Fragment 생명주기와 연결
     private val viewModel: GalleryViewModel by viewModels()
 
+    // Fragment의 뷰를 생성하는 메서드
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        // 데이터 바인딩 객체 생성
         val binding = FragmentGalleryBinding.inflate(inflater, container, false)
+
+        // context가 null이면 root 뷰를 반환
         context ?: return binding.root
 
+        // RecyclerView에 어댑터 연결
         binding.photoList.adapter = adapter
+
+        // 전달받은 식물 이름으로 검색 수행
         search(args.plantName)
 
+        // Toolbar의 뒤로가기 버튼 설정
         binding.toolbar.setNavigationOnClickListener { view ->
             view.findNavController().navigateUp()
         }
@@ -59,11 +75,16 @@ class GalleryFragment : Fragment() {
         return binding.root
     }
 
+    // 검색 작업 수행 메서드
     private fun search(query: String) {
-        // Make sure we cancel the previous job before creating a new one
+        // 이전 검색 작업이 있다면 취소
         searchJob?.cancel()
+
+        // 새로운 검색 작업을 Coroutine으로 실행
         searchJob = lifecycleScope.launch {
+            // ViewModel에서 검색 결과를 Flow 형태로 수집
             viewModel.searchPictures(query).collectLatest {
+                // Adapter에 데이터 전달
                 adapter.submitData(it)
             }
         }

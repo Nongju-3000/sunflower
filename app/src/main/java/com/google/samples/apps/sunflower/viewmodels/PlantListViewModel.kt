@@ -32,54 +32,34 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
- * The ViewModel for [PlantListFragment].
+ * PlantListViewModel은 [PlantListFragment]를 위한 ViewModel로,
+ * 식물 데이터를 관리하고 UI와 데이터 소스를 연결합니다.
+ * - Dagger Hilt를 통해 의존성을 주입받습니다.
  */
 @HiltViewModel
 class PlantListViewModel @Inject internal constructor(
-    plantRepository: PlantRepository,
-    private val savedStateHandle: SavedStateHandle
+    plantRepository: PlantRepository, // 식물 데이터를 제공하는 Repository
+    private val savedStateHandle: SavedStateHandle // ViewModel 상태를 저장하는 핸들
 ) : ViewModel() {
 
+    // 성장 구역 정보를 관리하는 StateFlow
     private val growZone: MutableStateFlow<Int> = MutableStateFlow(
         savedStateHandle.get(GROW_ZONE_SAVED_STATE_KEY) ?: NO_GROW_ZONE
     )
 
+    // 성장 구역에 따라 필터링된 식물 데이터를 제공
     val plants: LiveData<List<Plant>> = growZone.flatMapLatest { zone ->
         if (zone == NO_GROW_ZONE) {
-            plantRepository.getPlants()
+            plantRepository.getPlants() // 모든 식물 데이터 반환
         } else {
-            plantRepository.getPlantsWithGrowZoneNumber(zone)
+            plantRepository.getPlantsWithGrowZoneNumber(zone) // 특정 성장 구역에 해당하는 식물 반환
         }
     }.asLiveData()
 
     init {
-
         /**
-         * When `growZone` changes, store the new value in `savedStateHandle`.
-         *
-         * There are a few ways to write this; all of these are equivalent. (This info is from
-         * https://github.com/android/sunflower/pull/671#pullrequestreview-548900174)
-         *
-         * 1) A verbose version:
-         *
-         *    viewModelScope.launch {
-         *        growZone.onEach { newGrowZone ->
-         *            savedStateHandle.set(GROW_ZONE_SAVED_STATE_KEY, newGrowZone)
-         *        }
-         *    }.collect()
-         *
-         * 2) A simpler version of 1). Since we're calling `collect`, we can consume
-         *    the elements in the `collect`'s lambda block instead of using the `onEach` operator.
-         *    This is the version that's used in the live code below.
-         *
-         * 3) We can avoid creating a new coroutine using the `launchIn` terminal operator. In this
-         *    case, `onEach` is needed because `launchIn` doesn't take a lambda to consume the new
-         *    element in the Flow; it takes a `CoroutineScope` that's used to create a coroutine
-         *    internally.
-         *
-         *    growZone.onEach { newGrowZone ->
-         *        savedStateHandle.set(GROW_ZONE_SAVED_STATE_KEY, newGrowZone)
-         *    }.launchIn(viewModelScope)
+         * 성장 구역(growZone)이 변경될 때마다 SavedStateHandle에 저장
+         * - SavedStateHandle은 상태를 저장하여 프로세스 종료 후에도 데이터 복원 가능
          */
         viewModelScope.launch {
             growZone.collect { newGrowZone ->
@@ -88,18 +68,32 @@ class PlantListViewModel @Inject internal constructor(
         }
     }
 
+    /**
+     * 특정 성장 구역 번호를 설정
+     * @param num: 설정할 성장 구역 번호
+     */
     fun setGrowZoneNumber(num: Int) {
         growZone.value = num
     }
 
+    /**
+     * 성장 구역 번호를 초기화 (필터링 해제)
+     */
     fun clearGrowZoneNumber() {
         growZone.value = NO_GROW_ZONE
     }
 
+    /**
+     * 현재 필터링 상태를 확인
+     * @return 필터링 상태 (true: 필터링됨, false: 필터링되지 않음)
+     */
     fun isFiltered() = growZone.value != NO_GROW_ZONE
 
     companion object {
+        // 성장 구역이 설정되지 않은 상태를 나타내는 상수
         private const val NO_GROW_ZONE = -1
+
+        // SavedStateHandle에 사용되는 키
         private const val GROW_ZONE_SAVED_STATE_KEY = "GROW_ZONE_SAVED_STATE_KEY"
     }
 }
