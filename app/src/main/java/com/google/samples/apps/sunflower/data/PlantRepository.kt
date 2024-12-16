@@ -44,6 +44,22 @@ class PlantRepository @Inject constructor(private val plantDao: PlantDao) {
     fun getPlant(plantId: String) = plantDao.getPlant(plantId)
 
     /**
+     * 특정 검색어에 해당하는 식물 데이터를 반환
+     * @param query 검색어
+     * @return Flow<List<Plant>> 형태의 필터링된 식물 데이터 스트림
+     */
+    fun getPlantsByQuery(query: String) = plantDao.getPlantByQuery(query)
+
+    /**
+     * 특정 성장 구역 번호와 검색어에 해당하는 식물 데이터를 반환
+     * @param zone 성장 구역 번호
+     * @param query 검색어
+     * @return Flow<List<Plant>> 형태의 필터링된 식물 데이터 스트림
+     */
+    fun getPlantsWithGrowZoneAndQuery(zone: Int, query: String) =
+        plantDao.getPlantsWithGrowZoneAndQuery(zone, query)
+
+    /**
      * 특정 성장 구역 번호에 해당하는 식물 데이터를 반환
      * @param growZoneNumber 성장 구역 번호
      * @return Flow<List<Plant>> 형태의 필터링된 식물 데이터 스트림

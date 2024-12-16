@@ -26,7 +26,6 @@ import com.google.samples.apps.sunflower.data.Plant
 import com.google.samples.apps.sunflower.data.PlantRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -47,14 +46,20 @@ class PlantListViewModel @Inject internal constructor(
         savedStateHandle.get(GROW_ZONE_SAVED_STATE_KEY) ?: NO_GROW_ZONE
     )
 
+    private val searchQuery: MutableStateFlow<String> = MutableStateFlow("")
+
     // 성장 구역에 따라 필터링된 식물 데이터를 제공
-    val plants: LiveData<List<Plant>> = growZone.flatMapLatest { zone ->
-        if (zone == NO_GROW_ZONE) {
-            plantRepository.getPlants() // 모든 식물 데이터 반환
-        } else {
-            plantRepository.getPlantsWithGrowZoneNumber(zone) // 특정 성장 구역에 해당하는 식물 반환
+    val plants: LiveData<List<Plant>> = growZone
+        .flatMapLatest { zone ->
+            searchQuery.flatMapLatest { query ->
+                if (zone == NO_GROW_ZONE) {
+                    plantRepository.getPlantsByQuery(query) // 검색 쿼리 적용
+                } else {
+                    plantRepository.getPlantsWithGrowZoneAndQuery(zone, query) // 성장 구역과 검색 적용
+                }
+            }
         }
-    }.asLiveData()
+        .asLiveData()
 
     init {
         /**
@@ -66,6 +71,10 @@ class PlantListViewModel @Inject internal constructor(
                 savedStateHandle.set(GROW_ZONE_SAVED_STATE_KEY, newGrowZone)
             }
         }
+    }
+
+    fun setSearchQuery(query: String) {
+        searchQuery.value = query
     }
 
     /**
@@ -88,6 +97,7 @@ class PlantListViewModel @Inject internal constructor(
      * @return 필터링 상태 (true: 필터링됨, false: 필터링되지 않음)
      */
     fun isFiltered() = growZone.value != NO_GROW_ZONE
+
 
     companion object {
         // 성장 구역이 설정되지 않은 상태를 나타내는 상수

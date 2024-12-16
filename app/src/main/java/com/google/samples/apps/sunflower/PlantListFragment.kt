@@ -75,6 +75,25 @@ class PlantListFragment : Fragment() {
      */
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_plant_list, menu)
+
+        // SearchView 초기화
+        val searchItem = menu.findItem(R.id.search)
+        val searchView = searchItem.actionView as androidx.appcompat.widget.SearchView
+
+        // SearchView 텍스트 입력 리스너 추가
+        searchView.setOnQueryTextListener(object : androidx.appcompat.widget.SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                // 검색 버튼 클릭 시 동작
+                query?.let { viewModel.setSearchQuery(it) }
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                // 텍스트가 변경될 때 실시간 검색
+                newText?.let { viewModel.setSearchQuery(it) }
+                return true
+            }
+        })
     }
 
     /**

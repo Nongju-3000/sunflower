@@ -60,4 +60,22 @@ interface PlantDao {
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(plants: List<Plant>)
+
+    /**
+     * 특정 쿼리에 해당하는 식물 데이터를 가져옵니다.
+     * @param query 검색 쿼리
+     * @return Flow<List<Plant>> 형태의 필터링된 식물 데이터 스트림
+     */
+    @Query("SELECT * FROM plants WHERE name LIKE '%' || :query || '%'")
+    fun getPlantByQuery(query: String): Flow<List<Plant>>
+
+    /**
+     * 특정 성장 구역 번호와 쿼리에 해당하는 식물 데이터를 가져옵니다.
+     * @param zone 성장 구역 번호
+     * @param query 검색 쿼리
+     * @return Flow<List<Plant>> 형태의 필터링된 식물 데이터 스트림
+     */
+    @Query("SELECT * FROM plants WHERE growZoneNumber = :zone AND name LIKE '%' || :query || '%'")
+    fun getPlantsWithGrowZoneAndQuery(zone: Int, query: String): Flow<List<Plant>>
+
 }
